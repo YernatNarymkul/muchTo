@@ -6,13 +6,17 @@
 //
 
 import UIKit
-
+// MARK: - MemoryGame15x15ViewController
 class MemoryGame15x15ViewController: UIViewController {
     
     @IBOutlet weak var resultLabel: UILabel!
     @IBOutlet weak var mistakeLabel: UILabel!
     @IBOutlet weak var movesLabel: UILabel!
     @IBOutlet weak var timerLabel: UILabel!
+    @IBOutlet weak var x10Button: UIButton!
+    @IBOutlet weak var x8Button: UIButton!
+    @IBOutlet weak var x5Button: UIButton!
+    @IBOutlet weak var x4Button: UIButton!
     
     // 30 карт: 15 пар (1-15, каждая по два раза)
     var images = (1...15).flatMap { [$0, $0] }.map { String($0) }
@@ -30,6 +34,7 @@ class MemoryGame15x15ViewController: UIViewController {
         var mistakes: Int
     }
     
+    // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 1.0, green: 0.9, blue: 0.8, alpha: 1.0)
@@ -40,9 +45,39 @@ class MemoryGame15x15ViewController: UIViewController {
         
         shuffleImages() // Перемешиваем изображения при загрузке
         
+        mistakeLabel.layer.cornerRadius = 10
+        mistakeLabel.clipsToBounds = true
+        
+        movesLabel.layer.cornerRadius = 10
+        movesLabel.clipsToBounds = true
+        
+        timerLabel.layer.cornerRadius = 10
+        timerLabel.clipsToBounds = true
+        
+        x10Button.layer.cornerRadius = 10
+        x10Button.clipsToBounds = true
+        
+        x8Button.layer.cornerRadius = 10
+        x8Button.clipsToBounds = true
+        
+        x5Button.layer.cornerRadius = 10
+        x5Button.clipsToBounds = true
+        
+        x4Button.layer.cornerRadius = 10
+        x4Button.clipsToBounds = true
+        
+        // Закругление углов для всех игровых кнопок
+        for i in 1...30 {
+            if let button = view.viewWithTag(i) as? UIButton {
+                button.layer.cornerRadius = 10
+                button.clipsToBounds = true
+            }
+        }
+        
         print("IBOutlets connected - timerLabel: \(timerLabel != nil), movesLabel: \(movesLabel != nil), mistakeLabel: \(mistakeLabel != nil), resultLabel: \(resultLabel != nil)")
     }
     
+    // MARK: - game
     @IBAction func game(_ sender: UIButton) {
         let tag = sender.tag
         print("Button tag: \(tag)")
@@ -93,24 +128,27 @@ class MemoryGame15x15ViewController: UIViewController {
         }
     }
     
+    // MARK: - x4Game
     @IBAction func x4Game(_ sender: Any) {
         transitionTo(viewControllerID: "SecondViewController")
     }
     
+    // MARK: - x5Game
     @IBAction func x5Game(_ sender: Any) {
         transitionTo(viewControllerID: "ThirdViewController")
     }
     
+    // MARK: - x8Game
     @IBAction func x8Game(_ sender: Any) {
         transitionTo(viewControllerID: "ViewController")
     }
     
+    // MARK: - x10Game
     @IBAction func x10Game(_ sender: Any) {
         transitionTo(viewControllerID: "MemoryGame10x10ViewController")
     }
     
-    // MARK: - Game Logic
-    
+    // MARK: - startTimer()
     func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
@@ -122,6 +160,7 @@ class MemoryGame15x15ViewController: UIViewController {
         }
     }
     
+    // MARK: - checkWinCondition()
     func checkWinCondition() {
         if state.allSatisfy({ $0 == 2 }) {
             timer?.invalidate()
@@ -132,6 +171,7 @@ class MemoryGame15x15ViewController: UIViewController {
         }
     }
     
+    // MARK: - showWinAlert()
     func showWinAlert() {
         let alert = UIAlertController(
             title: "Победа!",
@@ -144,6 +184,7 @@ class MemoryGame15x15ViewController: UIViewController {
         present(alert, animated: true)
     }
     
+    // MARK: - restartGame()
     func restartGame() {
         state = [Int](repeating: 0, count: 30)
         isActive = false
@@ -169,11 +210,13 @@ class MemoryGame15x15ViewController: UIViewController {
         }
     }
     
+    // MARK: - shuffleImages()
     func shuffleImages() {
         images.shuffle()
         print("Shuffled images: \(images)")
     }
     
+    // MARK: - clear()
     @objc func clear() {
         for i in 0..<state.count {
             if state[i] == 1 {
@@ -187,8 +230,7 @@ class MemoryGame15x15ViewController: UIViewController {
         isActive = false
     }
     
-    // MARK: - Best Score
-    
+    // MARK: - getBestScore()
     func getBestScore() -> BestScore {
         let defaults = UserDefaults.standard
         return BestScore(
@@ -198,6 +240,7 @@ class MemoryGame15x15ViewController: UIViewController {
         )
     }
     
+    // MARK: - updateBestScore()
     func updateBestScore() {
         let currentScore = BestScore(time: timeCount, moves: movesCount, mistakes: mistakesCount)
         let bestScore = getBestScore()
@@ -214,6 +257,7 @@ class MemoryGame15x15ViewController: UIViewController {
         updateBestResultsLabel()
     }
     
+    // MARK: - updateBestResultsLabel()
     func updateBestResultsLabel() {
         let bestScore = getBestScore()
         if bestScore.time == 0 {
@@ -227,8 +271,7 @@ class MemoryGame15x15ViewController: UIViewController {
         }
     }
     
-    // MARK: - Navigation
-    
+    // MARK: - transitionTo()
     func transitionTo(viewControllerID: String) {
         dismiss(animated: true) {
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: viewControllerID) {

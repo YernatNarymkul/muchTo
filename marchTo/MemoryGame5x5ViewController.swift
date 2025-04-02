@@ -1,17 +1,21 @@
 //
-//  thirdViewController.swift
+//  MemoryGame5x5ViewController.swift
 //  marchTo
 //
 //  Created by Ернат on 01.04.2025.
 //
 import UIKit
-
+// MARK: - MemoryGame5x5ViewController
 class MemoryGame5x5ViewController: UIViewController {
     
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var movesLabel: UILabel!
     @IBOutlet weak var mistakesLabel: UILabel!
     @IBOutlet weak var bestResultsLabel: UILabel!
+    @IBOutlet weak var x15Button: UIButton!
+    @IBOutlet weak var x10Button: UIButton!
+    @IBOutlet weak var x8Button: UIButton!
+    @IBOutlet weak var x4Button: UIButton!
     
     var images = ["1", "2", "3", "4", "5",
                   "1", "2", "3", "4", "5"] // 10 картинок: 5 пар коров
@@ -31,15 +35,51 @@ class MemoryGame5x5ViewController: UIViewController {
         var mistakes: Int
     }
     
+    // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 1.0, green: 0.9, blue: 0.8, alpha: 1.0)
         timerLabel.text = "00:00:00"
         movesLabel.text = "Moves: 0"
         mistakesLabel.text = "Mistakes: 0"
-        updateBestResultsLabel() // Устанавливаем начальное значение для bestResults
+        updateBestResultsLabel() // Устанавливаем начальное значение для
+        
+        // Закругление углов для всех игровых кнопок
+        for i in 1...10 {
+            if let button = view.viewWithTag(i) as? UIButton {
+                button.layer.cornerRadius = 10
+                button.clipsToBounds = true
+            }
+        }
+        
+        mistakesLabel.layer.cornerRadius = 10
+        mistakesLabel.clipsToBounds = true
+        
+        movesLabel.layer.cornerRadius = 10
+        movesLabel.clipsToBounds = true
+        
+        timerLabel.layer.cornerRadius = 10
+        timerLabel.clipsToBounds = true
+        
+        x15Button.layer.cornerRadius = 10
+            x15Button.clipsToBounds = true
+        
+        x10Button.layer.cornerRadius = 10
+            x10Button.clipsToBounds = true
+        
+        x8Button.layer.cornerRadius = 10
+            x8Button.clipsToBounds = true
+        
+        x8Button.layer.cornerRadius = 10
+            x8Button.clipsToBounds = true
+        
+        x4Button.layer.cornerRadius = 10
+            x4Button.clipsToBounds = true
+        
+        
     }
     
+    // MARK: - game
     @IBAction func game(_ sender: UIButton) {
         print(sender.tag)
         
@@ -87,6 +127,7 @@ class MemoryGame5x5ViewController: UIViewController {
         checkWinCondition()
     }
     
+    // MARK: - x4Game
     @IBAction func x4Game(_ sender: Any) {
         dismiss(animated: true) {
             if let secondViewController = self.storyboard?.instantiateViewController(withIdentifier: "SecondViewController") as? MemoryGame4x4ViewController {
@@ -96,6 +137,7 @@ class MemoryGame5x5ViewController: UIViewController {
         }
     }
     
+    // MARK: - x8Game
     @IBAction func x8Game(_ sender: Any) {
         dismiss(animated: true) {
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "ViewController") as? MemoryGame8x8ViewController {
@@ -106,6 +148,7 @@ class MemoryGame5x5ViewController: UIViewController {
         
     }
     
+    // MARK: - x10Game
     @IBAction func x10Game(_ sender: Any) {
         dismiss(animated: true) {
             if let thirdViewController = self.storyboard?.instantiateViewController(withIdentifier: "MemoryGame10x10ViewController") as? MemoryGame10x10ViewController {
@@ -115,6 +158,7 @@ class MemoryGame5x5ViewController: UIViewController {
         }
     }
     
+    // MARK: - x15
     @IBAction func x15(_ sender: Any) {
         dismiss(animated: true) {
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "MemoryGame15x15ViewController") as? UIViewController {
@@ -123,7 +167,8 @@ class MemoryGame5x5ViewController: UIViewController {
             }
         }
     }
-        
+    
+    // MARK: - startTimer()
         func startTimer() {
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
                 guard let self = self else { return }
@@ -135,6 +180,7 @@ class MemoryGame5x5ViewController: UIViewController {
             }
         }
         
+    // MARK: - checkWinCondition()
         func checkWinCondition() {
             let allMatched = state.allSatisfy { $0 == 2 } // Все карты должны быть найдены
             if allMatched {
@@ -146,6 +192,7 @@ class MemoryGame5x5ViewController: UIViewController {
             }
         }
         
+    // MARK: - showWinAlert()
         func showWinAlert() {
             let alert = UIAlertController(
                 title: "Победа!",
@@ -160,6 +207,7 @@ class MemoryGame5x5ViewController: UIViewController {
             present(alert, animated: true, completion: nil)
         }
         
+    // MARK: - restartGame()
         func restartGame() {
             state = [Int](repeating: 0, count: 10)
             isActive = false
@@ -182,6 +230,7 @@ class MemoryGame5x5ViewController: UIViewController {
             }
         }
         
+    // MARK: - shuffleImagesAndUpdateWinState()
         func shuffleImagesAndUpdateWinState() {
             images.shuffle()
             
@@ -206,6 +255,7 @@ class MemoryGame5x5ViewController: UIViewController {
             winState = newWinState
         }
         
+    // MARK: - clear()
         @objc func clear() {
             for i in 0...9 { // 10 кнопок
                 if state[i] == 1 {
@@ -218,6 +268,7 @@ class MemoryGame5x5ViewController: UIViewController {
             isActive = false
         }
         
+    // MARK: - getBestScore()
         // Функция для получения текущего лучшего результата из UserDefaults
         func getBestScore() -> BestScore {
             let defaults = UserDefaults.standard
@@ -228,6 +279,7 @@ class MemoryGame5x5ViewController: UIViewController {
             return BestScore(time: time, moves: moves, mistakes: mistakes)
         }
         
+    // MARK: - updateBestScore()
         // Функция для обновления лучшего результата
         func updateBestScore() {
             let currentScore = BestScore(time: timeCount, moves: movesCount, mistakes: mistakesCount)
@@ -247,6 +299,7 @@ class MemoryGame5x5ViewController: UIViewController {
             updateBestResultsLabel() // Обновляем отображение после проверки
         }
         
+    // MARK: - updateBestResultsLabel()
         // Функция для обновления текста в bestResults
         func updateBestResultsLabel() {
             let bestScore = getBestScore()

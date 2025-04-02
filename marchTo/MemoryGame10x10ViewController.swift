@@ -6,13 +6,17 @@
 //
 
 import UIKit
-
+// MARK: - MemoryGame10x10ViewController
 class MemoryGame10x10ViewController: UIViewController {
     
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var movesLabel: UILabel!
     @IBOutlet weak var mistakesLabel: UILabel!
     @IBOutlet weak var bestResults: UILabel!
+    @IBOutlet weak var x15Button: UIButton!
+    @IBOutlet weak var x8Button: UIButton!
+    @IBOutlet weak var x5Button: UIButton!
+    @IBOutlet weak var x4Button: UIButton!
     
     var images = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                   "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] // 20 картинок: 10 пар
@@ -31,6 +35,7 @@ class MemoryGame10x10ViewController: UIViewController {
         var mistakes: Int
     }
     
+    // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 1.0, green: 0.9, blue: 0.8, alpha: 1.0)
@@ -39,10 +44,40 @@ class MemoryGame10x10ViewController: UIViewController {
         mistakesLabel.text = "Mistakes: 0"
         updateBestResultsLabel()
         
+        movesLabel.layer.cornerRadius = 10
+        movesLabel.clipsToBounds = true
+        
+        mistakesLabel.layer.cornerRadius = 10
+        mistakesLabel.clipsToBounds = true
+        
+        timerLabel.layer.cornerRadius = 10
+        timerLabel.clipsToBounds = true
+        
+        x15Button.layer.cornerRadius = 10
+        x15Button.clipsToBounds = true
+        
+        x8Button.layer.cornerRadius = 10
+        x8Button.clipsToBounds = true
+        
+        x5Button.layer.cornerRadius = 10
+        x5Button.clipsToBounds = true
+        
+        x4Button.layer.cornerRadius = 10
+        x4Button.clipsToBounds = true
+        
+        // Закругление углов для всех игровых кнопок
+        for i in 1...20 {
+            if let button = view.viewWithTag(i) as? UIButton {
+                button.layer.cornerRadius = 10
+                button.clipsToBounds = true
+            }
+        }
+        
         // Проверка подключения IBOutlets
         print("timerLabel: \(timerLabel != nil), movesLabel: \(movesLabel != nil), mistakesLabel: \(mistakesLabel != nil), bestResults: \(bestResults != nil)")
     }
     
+    // MARK: - game
     @IBAction func game(_ sender: UIButton) {
         let tag = sender.tag
         print("Button tag: \(tag)")
@@ -101,6 +136,7 @@ class MemoryGame10x10ViewController: UIViewController {
         checkWinCondition()
     }
     
+    // MARK: - x4Game
     @IBAction func x4Game(_ sender: Any) {
         dismiss(animated: true) {
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "SecondViewController") as? UIViewController {
@@ -110,6 +146,7 @@ class MemoryGame10x10ViewController: UIViewController {
         }
     }
     
+    // MARK: - x8Game
     @IBAction func x8Game(_ sender: Any) {
         dismiss(animated: true) {
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "ViewController") as? UIViewController {
@@ -119,6 +156,7 @@ class MemoryGame10x10ViewController: UIViewController {
         }
     }
     
+    // MARK: - x5
     @IBAction func x5(_ sender: Any) {
         dismiss(animated: true) {
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "ThirdViewController") as? UIViewController {
@@ -128,6 +166,7 @@ class MemoryGame10x10ViewController: UIViewController {
         }
     }
     
+    // MARK: - x15
     @IBAction func x15(_ sender: Any) {
         dismiss(animated: true) {
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "MemoryGame15x15ViewController") as? UIViewController {
@@ -137,6 +176,7 @@ class MemoryGame10x10ViewController: UIViewController {
         }
     }
     
+    // MARK: - tartTimer()
     func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
@@ -148,6 +188,7 @@ class MemoryGame10x10ViewController: UIViewController {
         }
     }
     
+    // MARK: - checkWinCondition()
     func checkWinCondition() {
         let allMatched = state.allSatisfy { $0 == 2 }
         if allMatched {
@@ -159,6 +200,7 @@ class MemoryGame10x10ViewController: UIViewController {
         }
     }
     
+    // MARK: - showWinAlert()
     func showWinAlert() {
         let alert = UIAlertController(
             title: "Победа!",
@@ -173,6 +215,7 @@ class MemoryGame10x10ViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    // MARK: - restartGame()
     func restartGame() {
         state = [Int](repeating: 0, count: 20)
         isActive = false
@@ -198,6 +241,7 @@ class MemoryGame10x10ViewController: UIViewController {
         }
     }
     
+    // MARK: - shuffleImagesAndUpdateWinState()
     func shuffleImagesAndUpdateWinState() {
         images.shuffle()
         
@@ -223,6 +267,7 @@ class MemoryGame10x10ViewController: UIViewController {
         print("Updated winState: \(winState)")
     }
     
+    // MARK: - clear()
     @objc func clear() {
         for i in 0...19 {
             if state[i] == 1 {
@@ -236,6 +281,7 @@ class MemoryGame10x10ViewController: UIViewController {
         isActive = false
     }
     
+    // MARK: - getBestScore()
     func getBestScore() -> BestScore {
         let defaults = UserDefaults.standard
         let time = defaults.integer(forKey: "bestTime10x10")
@@ -245,6 +291,7 @@ class MemoryGame10x10ViewController: UIViewController {
         return BestScore(time: time, moves: moves, mistakes: mistakes)
     }
     
+    // MARK: - updateBestScore()
     func updateBestScore() {
         let currentScore = BestScore(time: timeCount, moves: movesCount, mistakes: mistakesCount)
         var bestScore = getBestScore()
@@ -262,6 +309,7 @@ class MemoryGame10x10ViewController: UIViewController {
         updateBestResultsLabel()
     }
     
+    // MARK: - updateBestResultsLabel()
     func updateBestResultsLabel() {
         let bestScore = getBestScore()
         if bestScore.time == 0 {
